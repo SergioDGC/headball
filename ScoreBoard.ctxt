@@ -1,0 +1,11 @@
+#BlueJ class context
+comment0.target=ScoreBoard
+comment1.params=
+comment1.target=ScoreBoard()
+comment2.params=s1\ s2
+comment2.target=void\ update(int,\ int)
+comment3.params=
+comment3.target=void\ drawBoard()
+comment4.params=
+comment4.target=void\ act()
+numComments=5

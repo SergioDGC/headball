@@ -1,0 +1,7 @@
+#BlueJ class context
+comment0.target=GoalLabel
+comment1.params=text
+comment1.target=GoalLabel(java.lang.String)
+comment2.params=
+comment2.target=void\ act()
+numComments=3

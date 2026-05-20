@@ -1,0 +1,8 @@
+#BlueJ class context
+comment0.target=GoalLeft
+comment0.text=\n\ GoalLeft\ -\ Porteria\ izquierda.\n\ La\ imagen\ se\ asigna\ desde\ el\ editor\ de\ Greenfoot.\n
+comment1.params=
+comment1.target=GoalLeft()
+comment2.params=
+comment2.target=void\ act()
+numComments=3
