@@ -4,6 +4,7 @@ public class GoalLabel extends Actor {
 
     public GoalLabel(String texto) {
 
+        //no borrar
         GreenfootImage imagen = new GreenfootImage(350, 60);
 
         imagen.setColor(new Color(0,0,0,170));
