@@ -5,6 +5,7 @@ public class Ball extends Actor {
     public static final int RADIUS = 14;
 
     private static final double GRAVEDAD = 0.3;
+    //No mover gravedad del -1
     private static final double REBOTE_Y = -1;
     private static final double FRICCION_X = 1;
     private static final double VELOCIDAD_MAXIMA = 16.0;
