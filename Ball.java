@@ -4,127 +4,173 @@ public class Ball extends Actor {
 
     public static final int RADIUS = 14;
 
-    private static final double GRAVITY    = 0.6;
-    private static final double BOUNCE_Y   = -0.6;
-    private static final double FRICTION_X = 0.992;
-    private static final double MAX_SPEED  = 16.0;
+    private static final double GRAVEDAD = 0.3;
+    private static final double REBOTE_Y = -1;
+    private static final double FRICCION_X = 1;
+    private static final double VELOCIDAD_MAXIMA = 16.0;
 
-    private double vx = 1.5, vy = 0;
-    private boolean frozen = false;
+    private double velocidadX = 1.5;
+    private double velocidadY = 0;
+
+    private boolean congelada = false;
 
     public Ball() {
     }
 
     public void act() {
-        if (frozen) return;
-        applyPhysics();
-        checkWalls();
-        checkPlayerCollisions();
-    }
 
-    private void applyPhysics() {
-        vy += GRAVITY;
-        if (vx >  MAX_SPEED) vx =  MAX_SPEED;
-        if (vx < -MAX_SPEED) vx = -MAX_SPEED;
-        if (vy >  MAX_SPEED) vy =  MAX_SPEED;
-        if (vy < -MAX_SPEED) vy = -MAX_SPEED;
-
-        double nx = getX() + vx;
-        double ny = getY() + vy;
-
-        SoccerWorld world = (SoccerWorld) getWorld();
-        int floorLimit = world.getGroundY() - RADIUS;
-
-        if (ny >= floorLimit) {
-            ny = floorLimit;
-            vy *= BOUNCE_Y;
-            vx *= 0.92;
+        if (congelada) {
+            return;
         }
 
-        if (ny - RADIUS <= 5) {
-            ny = 5 + RADIUS;
-            vy *= -0.6;
-        }
-
-        vx *= FRICTION_X;
-        setLocation((int) nx, (int) ny);
+        aplicarFisica();
+        verificarParedes();
+        verificarColisionesJugadores();
     }
 
-    private void checkWalls() {
-        int x = getX();
-        int y = getY();
-        SoccerWorld world = (SoccerWorld) getWorld();
-        int groundY = world.getGroundY();
+    private void aplicarFisica() {
 
-        boolean inGoalZone = (y >= groundY - GoalLeft.HEIGHT && y <= groundY);
+        velocidadY += GRAVEDAD;
 
-        // Pared izquierda
-        if (x - RADIUS <= GoalLeft.WIDTH) {
-            if (!inGoalZone) {
-                setLocation(GoalLeft.WIDTH + RADIUS, y);
-                vx *= -0.65;
+        if (velocidadX > VELOCIDAD_MAXIMA) velocidadX = VELOCIDAD_MAXIMA;
+        if (velocidadX < -VELOCIDAD_MAXIMA) velocidadX = -VELOCIDAD_MAXIMA;
+
+        if (velocidadY > VELOCIDAD_MAXIMA) velocidadY = VELOCIDAD_MAXIMA;
+        if (velocidadY < -VELOCIDAD_MAXIMA) velocidadY = -VELOCIDAD_MAXIMA;
+
+        double nuevaX = getX() + velocidadX;
+        double nuevaY = getY() + velocidadY;
+
+        SoccerWorld mundo = (SoccerWorld) getWorld();
+
+        int limiteSuelo = mundo.getGroundY() - RADIUS;
+
+        if (nuevaY >= limiteSuelo) {
+            nuevaY = limiteSuelo;
+            velocidadY *= REBOTE_Y;
+            velocidadX *= 0.92;
+        }
+
+        if (nuevaY - RADIUS <= 5) {
+            nuevaY = 5 + RADIUS;
+            velocidadY *= -0.6;
+        }
+
+        velocidadX *= FRICCION_X;
+        setLocation((int) nuevaX, (int) nuevaY);
+    }
+
+    private void verificarParedes() {
+
+        int posicionX = getX();
+        int posicionY = getY();
+
+        SoccerWorld mundo = (SoccerWorld) getWorld();
+
+        int sueloY = mundo.getGroundY();
+
+        boolean dentroPorteria =(posicionY >= sueloY - GoalLeft.HEIGHT && posicionY <= sueloY);
+
+        if (posicionX - RADIUS <= GoalLeft.WIDTH) {
+
+            if (!dentroPorteria) {
+                setLocation(GoalLeft.WIDTH + RADIUS, posicionY);
+                velocidadX *= -0.65;
             }
         }
-        // Pared derecha
-        if (x + RADIUS >= SoccerWorld.WIDTH - GoalRight.WIDTH) {
-            if (!inGoalZone) {
-                setLocation(SoccerWorld.WIDTH - GoalRight.WIDTH - RADIUS, y);
-                vx *= -0.65;
-            }
-        }
-    }
 
-    private void checkPlayerCollisions() {
-        SoccerWorld world = (SoccerWorld) getWorld();
-        resolveCollisionP1(world.getPlayer1());
-        resolveCollisionP2(world.getPlayer2());
-    }
+        if (posicionX + RADIUS >= SoccerWorld.ANCHO_MUNDO - GoalRight.WIDTH) {
 
-    private void resolveCollisionP1(Player1 p) {
-        if (p == null) return;
-        int dx = getX() - p.getX();
-        int dy = getY() - p.getY();
-        double dist = Math.sqrt(dx * dx + dy * dy);
-        double minDist = RADIUS + Math.min(Player1.WIDTH, Player1.HEIGHT) / 2.0;
-
-        if (dist < minDist && dist > 0) {
-            double nx = dx / dist;
-            double ny = dy / dist;
-            setLocation((int)(p.getX() + nx * minDist),
-                        (int)(p.getY() + ny * minDist));
-            double relV = vx * nx + vy * ny;
-            if (relV < 0) {
-                vx -= 1.6 * relV * nx;
-                vy -= 1.6 * relV * ny;
+            if (!dentroPorteria) {
+                setLocation(  SoccerWorld.ANCHO_MUNDO - GoalRight.WIDTH - RADIUS,posicionY);
+                velocidadX *= -0.65;
             }
         }
     }
 
-    private void resolveCollisionP2(Player2 p) {
-        if (p == null) return;
-        int dx = getX() - p.getX();
-        int dy = getY() - p.getY();
-        double dist = Math.sqrt(dx * dx + dy * dy);
-        double minDist = RADIUS + Math.min(Player2.WIDTH, Player2.HEIGHT) / 2.0;
+    private void verificarColisionesJugadores() {
 
-        if (dist < minDist && dist > 0) {
-            double nx = dx / dist;
-            double ny = dy / dist;
-            setLocation((int)(p.getX() + nx * minDist),
-                        (int)(p.getY() + ny * minDist));
-            double relV = vx * nx + vy * ny;
-            if (relV < 0) {
-                vx -= 1.6 * relV * nx;
-                vy -= 1.6 * relV * ny;
+        SoccerWorld mundo = (SoccerWorld) getWorld();
+        resolverColisionJugador1(mundo.getPlayer1());
+        resolverColisionJugador2(mundo.getPlayer2());
+    }
+
+    private void resolverColisionJugador1(Player1 jugador) {
+
+        if (jugador == null) {
+            return;
+        }
+
+        int diferenciaX = getX() - jugador.getX();
+        int diferenciaY = getY() - jugador.getY();
+
+        double distancia = Math.sqrt(diferenciaX * diferenciaX + diferenciaY * diferenciaY);
+
+        double distanciaMinima =  RADIUS + Math.max(Player1.WIDTH, Player1.HEIGHT) / 2.0;
+
+        if (distancia < distanciaMinima && distancia > 0) {
+
+            double normalX = diferenciaX / distancia;
+            double normalY = diferenciaY / distancia;
+
+            setLocation( (int)(jugador.getX() + normalX * distanciaMinima),(int)(jugador.getY() + normalY * distanciaMinima));
+            double velocidadRelativa = velocidadX * normalX + velocidadY * normalY;
+
+            if (velocidadRelativa < 0) {
+                velocidadX -= 1.6 * velocidadRelativa * normalX;
+                velocidadY -= 1.6 * velocidadRelativa * normalY;
             }
         }
     }
 
-    public void applyForce(double fx, double fy) { vx = fx; vy = fy; }
-    public void freeze()        { frozen = true;  }
-    public void unfreeze()      { frozen = false; }
+    private void resolverColisionJugador2(Player2 jugador) {
+
+        if (jugador == null) {
+            return;
+        }
+
+        int diferenciaX = getX() - jugador.getX();
+        int diferenciaY = getY() - jugador.getY();
+
+        double distancia = Math.sqrt(diferenciaX * diferenciaX + diferenciaY * diferenciaY);
+
+        double distanciaMinima = RADIUS + Math.max(Player2.WIDTH, Player2.HEIGHT) / 2.0;
+
+        if (distancia < distanciaMinima && distancia > 0) {
+
+            double normalX = diferenciaX / distancia;
+            double normalY = diferenciaY / distancia;
+
+            setLocation(
+                    (int)(jugador.getX() + normalX * distanciaMinima),
+                    (int)(jugador.getY() + normalY * distanciaMinima));
+
+            double velocidadRelativa = velocidadX * normalX + velocidadY * normalY;
+
+            if (velocidadRelativa < 0) {
+
+                velocidadX -= 1.6 * velocidadRelativa * normalX;
+                velocidadY -= 1.6 * velocidadRelativa * normalY;
+            }
+        }
+    }
+
+    public void applyForce(double fuerzaX, double fuerzaY) {
+
+        velocidadX = fuerzaX;
+        velocidadY = fuerzaY;
+    }
+
+    public void freeze() {
+        congelada = true;
+    }
+
+    public void unfreeze() {
+        congelada = false;
+    }
+
     public void resetVelocity() {
-        vx = (Math.random() > 0.5 ? 1 : -1) * 1.5;
-        vy = 0;
+        velocidadX =(Math.random() > 0.5 ? 1 : -1) * 1.5;
+        velocidadY = 0;
     }
 }

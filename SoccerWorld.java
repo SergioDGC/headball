@@ -2,135 +2,170 @@ import greenfoot.*;
 
 public class SoccerWorld extends World {
 
-    public static final int WIDTH        = 800;
-    public static final int HEIGHT       = 500;
-    public static final int GROUND_Y     = 420;
-    public static final int GOALS_TO_WIN = 5;
+    public static final int ANCHO_MUNDO = 800;
+    public static final int ALTO_MUNDO = 500;
+    public static final int SUELO_Y = 420;
+    public static final int GOLES_PARA_GANAR = 5;
 
-    private int score1 = 0;
-    private int score2 = 0;
+    private int golesJugador1 = 0;
+    private int golesJugador2 = 0;
 
-    private boolean gameStarted = false;
-    private boolean gameOver    = false;
+    private boolean juegoIniciado = false;
+    private boolean juegoTerminado = false;
 
-    private Player1     player1;
-    private Player2     player2;
-    private Ball        ball;
-    private GoalLeft    goalLeft;
-    private GoalRight   goalRight;
-    private ScoreBoard  scoreBoard;
-    private StartButton startButton;
+    private Player1 jugador1;
+    private Player2 jugador2;
+    private Ball pelota;
+    private GoalLeft porteriaIzquierda;
+    private GoalRight porteriaDerecha;
+    private ScoreBoard marcador;
+    private StartButton botonInicio;
 
-    private int goalCooldown = 0;
+    private int tiempoEsperaGol = 0;
 
     public SoccerWorld() {
-        super(WIDTH, HEIGHT, 1);
-        prepare();
+        super(ANCHO_MUNDO, ALTO_MUNDO, 1);
+        preparar();
     }
 
-    private void prepare() {
-        // Porterias
-        goalLeft  = new GoalLeft();
-        goalRight = new GoalRight();
-        addObject(goalLeft,  GoalLeft.WIDTH / 2,          GROUND_Y - GoalLeft.HEIGHT / 2);
-        addObject(goalRight, WIDTH - GoalRight.WIDTH / 2, GROUND_Y - GoalRight.HEIGHT / 2);
+    private void preparar() {
 
-        // Jugadores
-        player1 = new Player1();
-        player2 = new Player2();
-        addObject(player1, WIDTH / 4,     GROUND_Y - Player1.HEIGHT / 2);
-        addObject(player2, WIDTH * 3 / 4, GROUND_Y - Player2.HEIGHT / 2);
+        porteriaIzquierda = new GoalLeft();
+        porteriaDerecha = new GoalRight();
 
-        // bochita
-        ball = new Ball();
-        addObject(ball, WIDTH / 2, GROUND_Y - Ball.RADIUS - -14);
+        addObject(porteriaIzquierda, GoalLeft.WIDTH / 2,  SUELO_Y - GoalLeft.HEIGHT / 2);
+        addObject(porteriaDerecha, ANCHO_MUNDO - GoalRight.WIDTH / 2,  SUELO_Y - GoalRight.HEIGHT / 2);
 
-        // Marcador
-        scoreBoard = new ScoreBoard();
-        addObject(scoreBoard, WIDTH / 2, 28);
+        jugador1 = new Player1();
+        jugador2 = new Player2();
 
-        // Boton inicio
-        startButton = new StartButton();
-        addObject(startButton, WIDTH / 2, HEIGHT / 2);
+        addObject(jugador1,ANCHO_MUNDO / 4, SUELO_Y - Player1.HEIGHT / 2);
+
+        addObject(jugador2, ANCHO_MUNDO * 3 / 4,SUELO_Y - Player2.HEIGHT / 2);
+
+        pelota = new Ball();
+        addObject(pelota, ANCHO_MUNDO / 2, SUELO_Y - Ball.RADIUS - -14);
+
+        marcador = new ScoreBoard();
+        addObject(marcador, ANCHO_MUNDO / 2, 28);
+
+        botonInicio = new StartButton();
+        addObject(botonInicio, ANCHO_MUNDO / 2, ALTO_MUNDO / 2);
 
         Greenfoot.setSpeed(50);
     }
 
     public void act() {
-        if (!gameStarted || gameOver) return;
 
-        if (goalCooldown > 0) {
-            goalCooldown--;
-            if (goalCooldown == 0) resetAfterGoal();
+        if (!juegoIniciado || juegoTerminado) {
+            return;
+        }
+        if (tiempoEsperaGol > 0) {
+
+            tiempoEsperaGol--;
+            if (tiempoEsperaGol == 0) {
+                reiniciarDespuesGol();
+            }
             return;
         }
 
-        checkGoal();
+        verificarGol();
     }
 
-    private void checkGoal() {
-        int bx = ball.getX();
-        int by = ball.getY();
+    private void verificarGol() {
 
-        // Porteria izquierda: gol para P2
-        if (bx - Ball.RADIUS <= GoalLeft.WIDTH
-            && by >= GROUND_Y - GoalLeft.HEIGHT
-            && by <= GROUND_Y) {
-            registerGoal(2);
+        int posicionX = pelota.getX();
+        int posicionY = pelota.getY();
+
+        if (posicionX - Ball.RADIUS <= GoalLeft.WIDTH
+                && posicionY >= SUELO_Y - GoalLeft.HEIGHT
+                && posicionY <= SUELO_Y) {
+
+            registrarGol(2);
         }
-        // Porteria derecha: gol para P2
-        else if (bx + Ball.RADIUS >= WIDTH - GoalRight.WIDTH
-                 && by >= GROUND_Y - GoalRight.HEIGHT
-                 && by <= GROUND_Y) {
-            registerGoal(1);
-        }
-    }
 
-    private void registerGoal(int scorer) {
-        if (scorer == 1) score1++;
-        else             score2++;
+        else if (posicionX + Ball.RADIUS >= ANCHO_MUNDO - GoalRight.WIDTH
+                && posicionY >= SUELO_Y - GoalRight.HEIGHT
+                && posicionY <= SUELO_Y) {
 
-        scoreBoard.update(score1, score2);
-        goalCooldown = 90;
-
-        player1.freeze();
-        player2.freeze();
-        ball.freeze();
-
-        GoalLabel lbl = new GoalLabel("  GOOOL!  -  Jugador " + scorer);
-        addObject(lbl, WIDTH / 2, HEIGHT / 2);
-
-        if (score1 >= GOALS_TO_WIN || score2 >= GOALS_TO_WIN) {
-            gameOver = true;
-            int winner = (score1 >= GOALS_TO_WIN) ? 1 : 2;
-            WinLabel win = new WinLabel("JUGADOR " + winner + " GANA! (Reset para repetir)");
-            addObject(win, WIDTH / 2, HEIGHT / 2 + 70);
+            registrarGol(1);
         }
     }
 
-    private void resetAfterGoal() {
+    private void registrarGol(int jugadorAnotador) {
+
+        if (jugadorAnotador == 1) {
+            golesJugador1++;
+        } else {
+            golesJugador2++;
+        }
+
+        marcador.update(golesJugador1, golesJugador2);
+
+        tiempoEsperaGol = 90;
+
+        jugador1.freeze();
+        jugador2.freeze();
+        pelota.freeze();
+
+        GoalLabel etiquetaGol = new GoalLabel("  GOOOLAZO!  -  Jugador " + jugadorAnotador);
+
+        addObject(etiquetaGol, ANCHO_MUNDO / 2, ALTO_MUNDO / 2);
+
+        if (golesJugador1 >= GOLES_PARA_GANAR
+                || golesJugador2 >= GOLES_PARA_GANAR) {
+
+            juegoTerminado = true;
+            int jugadorGanador =(golesJugador1 >= GOLES_PARA_GANAR) ? 1 : 2;
+            WinLabel etiquetaGanador = new WinLabel("JUGADOR " + jugadorGanador + " GANA! (Reset para repetir)");
+            addObject(etiquetaGanador, ANCHO_MUNDO / 2,ALTO_MUNDO / 2 + 70);
+        }
+    }
+
+    private void reiniciarDespuesGol() {
+
         removeObjects(getObjects(GoalLabel.class));
 
-        player1.unfreeze();
-        player2.unfreeze();
-        ball.unfreeze();
+        jugador1.unfreeze();
+        jugador2.unfreeze();
+        pelota.unfreeze();
 
-        player1.setLocation(WIDTH / 4,     GROUND_Y - Player1.HEIGHT / 2);
-        player2.setLocation(WIDTH * 3 / 4, GROUND_Y - Player2.HEIGHT / 2);
-        player1.resetVelocity();
-        player2.resetVelocity();
+        jugador1.setLocation(
+                ANCHO_MUNDO / 4,
+                SUELO_Y - Player1.HEIGHT / 2);
 
-        ball.setLocation(WIDTH / 2, GROUND_Y - Ball.RADIUS - -14);
-        ball.resetVelocity();
+        jugador2.setLocation(
+                ANCHO_MUNDO * 3 / 4,
+                SUELO_Y - Player2.HEIGHT / 2);
+
+        jugador1.resetVelocity();
+        jugador2.resetVelocity();
+
+        pelota.setLocation(
+                ANCHO_MUNDO / 2,
+                SUELO_Y - Ball.RADIUS - -14);
+
+        pelota.resetVelocity();
     }
 
     public void startGame() {
-        removeObject(startButton);
-        gameStarted = true;
+        removeObject(botonInicio);
+        juegoIniciado = true;
     }
 
-    public int      getGroundY()  { return GROUND_Y; }
-    public Player1  getPlayer1()  { return player1;  }
-    public Player2  getPlayer2()  { return player2;  }
-    public Ball     getBall()     { return ball;      }
+    public int getGroundY() {
+        return SUELO_Y;
+    }
+
+    public Player1 getPlayer1() {
+        return jugador1;
+    }
+
+    public Player2 getPlayer2() {
+        return jugador2;
+    }
+
+    public Ball getBall() {
+        return pelota;
+    }
 }

@@ -2,23 +2,18 @@ import greenfoot.*;
 
 public class GoalLabel extends Actor {
 
-    public GoalLabel(String text) {
-        int w = 360;
-        int h = 66;
-        GreenfootImage img = new GreenfootImage(w, h);
+    public GoalLabel(String texto) {
 
-        img.setColor(new Color(0, 0, 0, 150));
-        img.fillRect(0, 0, w, h);
+        GreenfootImage imagen = new GreenfootImage(350, 60);
 
-        img.setColor(new Color(255, 215, 0));
-        img.drawRect(0, 0, w - 1, h - 1);
+        imagen.setColor(new Color(0,0,0,170));
+        imagen.fillRect(0,0,350,60);
 
-        img.setColor(new Color(255, 215, 0));
-        img.setFont(new Font("Arial", true, false, 32));
-        img.drawString(text, 10, 46);
+        imagen.setColor(Color.YELLOW);
+        imagen.setFont(new Font("Arial", true, false, 30));
 
-        setImage(img);
+        imagen.drawString(texto, 20, 38);
+
+        setImage(imagen);
     }
-
-    public void act() { }
 }

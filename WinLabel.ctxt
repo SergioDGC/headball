@@ -1,8 +1,5 @@
 #BlueJ class context
 comment0.target=WinLabel
-comment0.text=\n\ WinLabel\ -\ Muestra\ el\ ganador\ al\ terminar\ la\ partida.\n
-comment1.params=text
+comment1.params=texto
 comment1.target=WinLabel(java.lang.String)
-comment2.params=
-comment2.target=void\ act()
-numComments=3
+numComments=2

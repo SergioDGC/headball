@@ -1,27 +1,19 @@
 import greenfoot.*;
 
-/**
- * WinLabel - Muestra el ganador al terminar la partida.
- */
 public class WinLabel extends Actor {
 
-    public WinLabel(String text) {
-        int w = 420;
-        int h = 58;
-        GreenfootImage img = new GreenfootImage(w, h);
+    public WinLabel(String texto) {
 
-        img.setColor(new Color(0, 0, 0, 180));
-        img.fillRect(0, 0, w, h);
+        GreenfootImage imagen = new GreenfootImage(400, 60);
 
-        img.setColor(new Color(100, 220, 255));
-        img.drawRect(0, 0, w - 1, h - 1);
+        imagen.setColor(new Color(0,0,0,170));
+        imagen.fillRect(0,0,400,60);
 
-        img.setColor(new Color(100, 220, 255));
-        img.setFont(new Font("Arial", true, false, 26));
-        img.drawString(text, 10, 40);
+        imagen.setColor(Color.CYAN);
+        imagen.setFont(new Font("Arial", true, false, 28));
 
-        setImage(img);
+        imagen.drawString(texto, 20, 38);
+
+        setImage(imagen);
     }
-
-    public void act() { }
 }
