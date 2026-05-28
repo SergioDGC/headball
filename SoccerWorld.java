@@ -44,7 +44,7 @@ public class SoccerWorld extends World {
         addObject(jugador2, ANCHO_MUNDO * 3 / 4,SUELO_Y - Player2.HEIGHT / 2);
 
         pelota = new Ball();
-        addObject(pelota, ANCHO_MUNDO / 2, SUELO_Y - Ball.RADIUS - -14);
+        addObject(pelota, ANCHO_MUNDO / 2, SUELO_Y - Ball.RADIUS - (-14));
 
         marcador = new ScoreBoard();
         addObject(marcador, ANCHO_MUNDO / 2, 28);
@@ -103,6 +103,7 @@ public class SoccerWorld extends World {
         marcador.update(golesJugador1, golesJugador2);
 
         tiempoEsperaGol = 90;
+        Greenfoot.playSound("gol.mp3");
 
         jugador1.freeze();
         jugador2.freeze();

@@ -6,6 +6,7 @@ public class GoalLabel extends Actor {
 
         //no borrar
         GreenfootImage imagen = new GreenfootImage(350, 60);
+        Greenfoot.playSound("gol.mp3");
 
         imagen.setColor(new Color(0,0,0,170));
         imagen.fillRect(0,0,350,60);

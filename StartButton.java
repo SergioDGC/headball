@@ -36,6 +36,7 @@ public class StartButton extends Actor {
             SoccerWorld mundo = (SoccerWorld) getWorld();
 
             mundo.startGame();
+            Greenfoot.playSound("playtime.mp3");
         }
     }
 }
